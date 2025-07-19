@@ -1,0 +1,63 @@
+#navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  background-color: #333;
+  color: white;
+  padding: 20px 20px; /* Más altura */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  overflow: visible;
+  z-index: 1000;
+  position: relative; /* Para posicionar hijos absolutos */
+}
+
+.menu-central {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.menu-central li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.menu-central li a:hover {
+  text-decoration: underline;
+}
+
+.perfil {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.perfil a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.perfil a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 500px) {
+  .menu-central {
+    gap: 15px;
+    overflow-x: auto;
+  }
+}
