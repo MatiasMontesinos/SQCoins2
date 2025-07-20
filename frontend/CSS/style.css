@@ -1,16 +1,21 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff; /* color fondo igual al contenido */
+  background-color: #fff; 
   font-family: Arial, sans-serif;
-  box-sizing: border-box;
+  box-sizing: border-box; 
 }
 
 main#contenido {
-  padding: 20px;
-  padding-top: 60px; /* deja espacio para navbar fija */
-  background-color: #fff; /* mismo color que body */
-  min-height: 100vh; /* que ocupe todo alto */
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 10px; 
+  padding-top: 60px; 
+  background-color: #fff;
+  min-height: 100vh;
   box-sizing: border-box;
-  /* No margin-top para evitar espacios extra */
+  background-image: url("../imagenes/fondocasino.jpg");
+  background-size: cover;       
+  background-position: center; 
+  background-repeat: no-repeat; 
 }
