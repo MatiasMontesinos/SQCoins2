@@ -1,15 +1,32 @@
-// Carga una página HTML en el contenedor principal
 function cargarPagina(archivo, url) {
   fetch(`Paginas/${archivo}`)
     .then(res => res.text())
     .then(html => {
       document.getElementById('contenido').innerHTML = html;
+      
+      // Si cargamos perfil, ejecutamos el script para inicializarlo
+      if (archivo === 'pagina5-perfil.html') {
+        if (typeof inicializarPerfil === 'function') {
+          inicializarPerfil();
+        }
+      }
+      if (archivo === 'pagina5-perfil.html') {
+        if (typeof inicializarPerfil === 'function') {
+           inicializarPerfil();
+          }
+        if (typeof inicializarEventosPerfil === 'function') {
+          inicializarEventosPerfil();
+        }
+}
+
+
       history.pushState({ archivo }, '', url);
     })
     .catch(() => {
       document.getElementById('contenido').innerHTML = '<p>Error al cargar la página.</p>';
     });
 }
+
 
 // Escucha clics en cualquier enlace con data-pagina
 document.addEventListener('click', (e) => {
@@ -50,6 +67,11 @@ window.addEventListener('popstate', (e) => {
       .then(res => res.text())
       .then(html => {
         document.getElementById('contenido').innerHTML = html;
+        if (e.state.archivo === 'pagina5-perfil.html') {
+          if (typeof inicializarPerfil === 'function') {
+            inicializarPerfil();
+          }
+        }
       });
   }
 });

@@ -41,3 +41,40 @@
 .formulario-registro button:hover, .formulario-login button:hover {
   background-color: #2980b9;
 }
+
+#contenidoPostLogin {
+  width: 350px;
+  margin: 30px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  font-family: Arial, sans-serif;
+}
+
+#contenidoPostLogin h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#contenidoPostLogin table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#contenidoPostLogin th,
+#contenidoPostLogin td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+#contenidoPostLogin th {
+  background-color: #3498db;
+  color: white;
+}
+
+.info-row {
+  margin-bottom: 12px;
+  font-size: 16px;
+}

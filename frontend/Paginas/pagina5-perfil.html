@@ -6,7 +6,7 @@
       <label for="nombre">Nombre:</label>
       <input type="text" id="nombre" name="nombre" required />
 
-      <label for="apellido">Apellido:</label>
+      <label for="apellido">Apodo:</label>
       <input type="text" id="apellido" name="apellido" required />
 
       <label for="fechaNacimiento">Fecha de nacimiento:</label>
@@ -36,4 +36,30 @@
     </form>
   </div>
 </div>
+
+<!-- Info de usuario después del log in -->
+<div id="contenidoPostLogin" style="display: none; margin-top: 20px; position: relative; max-width: 350px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.15); font-family: Arial, sans-serif;">
+  <h2 style="text-align:center; margin-bottom: 20px;">¡Bienvenido, <span id="nombreUsuario"></span>!</h2>
+
+  <div class="info-row">
+    Apodo: <span id="apodoUsuario"></span>
+  </div>
+  <div class="info-row">
+    Fecha de nacimiento: <span id="fechaNacimientoUsuario"></span>
+  </div>
+  <div class="info-row">
+    Monedas totales: <span id="monedasUsuario"></span>
+  </div>
+
+  <!-- Botón Editar -->
+  <button id="btnEditar" style="position: absolute; bottom: 15px; right: 15px;">Editar Apodo</button>
+
+  <!-- Formulario de edición oculto inicialmente -->
+  <div id="formEditar" style="display: none; margin-top: 20px;">
+    <input type="text" id="nuevoApodo" placeholder="Nuevo apodo" />
+    <button id="btnConfirmar">Confirmar</button>
+    <button id="btnCancelar">Cancelar</button>
+  </div>
+</div>
+
 
