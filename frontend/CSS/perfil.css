@@ -1,0 +1,43 @@
+.formulario-registro, .formulario-login {
+  width: 300px;
+  margin: 20px auto;
+  background-color: rgba(255,255,255,0.9);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.formulario-registro h2, .formulario-login h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.formulario-registro label, .formulario-login label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.formulario-registro input, .formulario-login input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.formulario-registro button, .formulario-login button {
+  width: 100%;
+  padding: 10px;
+  background-color: #3498db;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.formulario-registro button:hover, .formulario-login button:hover {
+  background-color: #2980b9;
+}

@@ -1,4 +1,4 @@
-// Cargar una página HTML en el contenedor principal
+// Carga una página HTML en el contenedor principal
 function cargarPagina(archivo, url) {
   fetch(`Paginas/${archivo}`)
     .then(res => res.text())
@@ -11,7 +11,7 @@ function cargarPagina(archivo, url) {
     });
 }
 
-// Escuchar clics en cualquier enlace con data-pagina (delegación)
+// Escucha clics en cualquier enlace con data-pagina
 document.addEventListener('click', (e) => {
   const link = e.target.closest('a[data-pagina]');
   if (link) {
@@ -22,7 +22,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Cargar navbar una vez y contenido inicial según la URL
+// Carga navbar una vez y contenido inicial
 window.addEventListener('DOMContentLoaded', () => {
   fetch('Paginas/navbar.html')
     .then(res => res.text())

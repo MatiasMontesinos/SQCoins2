@@ -1,2 +1,39 @@
-<h1>Perfil</h1>
-<p>Perfil de usuario</p>
+<div class="perfil-container">
+  <!-- Formulario de Registro -->
+  <div class="formulario-registro">
+    <h2>Registro</h2>
+    <form id="formRegistro">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required />
+
+      <label for="apellido">Apellido:</label>
+      <input type="text" id="apellido" name="apellido" required />
+
+      <label for="fechaNacimiento">Fecha de nacimiento:</label>
+      <input type="date" id="fechaNacimiento" name="fechaNacimiento" required />
+      <div id="errorEdad" style="color: red; display: none; font-size: 0.9em;">
+        Debes tener al menos 18 años para registrarte.
+      </div>
+
+      <label for="passwordRegistro">Contraseña:</label>
+      <input type="password" id="passwordRegistro" name="passwordRegistro" required />
+
+      <button type="submit" id="btnRegistrar">Registrar</button>
+    </form>
+  </div>
+
+  <!-- Formulario de Login -->
+  <div class="formulario-login" style="margin-top: 40px;">
+    <h2>Iniciar sesión</h2>
+    <form id="formLogin">
+      <label for="nombreLogin">Nombre:</label>
+      <input type="text" id="nombreLogin" name="nombreLogin" required />
+
+      <label for="passwordLogin">Contraseña:</label>
+      <input type="password" id="passwordLogin" name="passwordLogin" required />
+
+      <button type="submit" id="btnLogin">Ingresar</button>
+    </form>
+  </div>
+</div>
+
