@@ -1,0 +1,113 @@
+#buscaminas-container {
+  font-family: Arial, sans-serif;
+  max-width: 320px;
+  margin: 2rem auto;
+  text-align: center;
+  padding: 1rem;
+  border: 2px solid #333;
+  border-radius: 12px;
+  background: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#buscaminas-container h2 {
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+#buscaminas-container #controls {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px #ddd;
+}
+
+#buscaminas-container label {
+  font-weight: 600;
+  margin-right: 6px;
+  color: #444;
+}
+
+#buscaminas-container input[type="number"] {
+  width: 60px;
+  padding: 4px 6px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  transition: border-color 0.3s ease;
+}
+
+#buscaminas-container input[type="number"]:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px #4caf50;
+}
+
+#buscaminas-container button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+#buscaminas-container button:hover {
+  background-color: #45a047;
+}
+
+#buscaminas-container #board {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 5px;
+  margin: 0 auto;
+}
+
+#buscaminas-container .cell {
+  width: 60px;
+  height: 60px;
+  background: #ddd;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 24px;
+  cursor: pointer;
+  user-select: none;
+  line-height: 60px;
+  transition: background-color 0.3s ease;
+  box-shadow: inset 0 0 3px #bbb;
+}
+
+#buscaminas-container .cell:hover:not(.clicked) {
+  background-color: #ccc;
+}
+
+#buscaminas-container .cell.clicked {
+  background: #aaa;
+  cursor: default;
+  box-shadow: inset 0 0 4px #666;
+}
+
+#buscaminas-container .cell.bomb {
+  background: #f44336 !important;
+  color: white;
+  box-shadow: inset 0 0 6px #b71c1c;
+}
+
+#buscaminas-container #message {
+  margin-top: 1.5rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #222;
+  min-height: 1.5em;
+}

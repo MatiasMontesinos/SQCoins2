@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
     cant_apostada_juego1 INTEGER NOT NULL DEFAULT 0,
     cant_ganada_juego1 INTEGER NOT NULL DEFAULT 0,
+    cant_ganada_total INTEGER NOT NULL DEFAULT 0,
     cant_perdida_juego1 INTEGER NOT NULL DEFAULT 0,
     cant_creada_juego1 INTEGER NOT NULL DEFAULT 0,
 

@@ -1,13 +1,16 @@
-if (!localStorage.getItem('usuarioID')) {
-  localStorage.setItem('usuarioID', '7'); // ID de ejemplo para pruebas
+// Al inicio de coinflip-juego.js
+const salaID = localStorage.getItem('salaCoinflip');
+if (!salaID) {
+  alert('No hay sala activa. Volviendo al listado de salas.');
+  cargarPagina('pagina2-juego1.html', '/coinflip'); // Ajusta ruta SPA si es necesario
+  throw new Error('No hay sala activa'); // detiene ejecución
 }
 
-const idSala = parseInt(localStorage.getItem('salaCoinflip'));
+const idSala = parseInt(salaID);
 if (!idSala) {
   alert('No se encontró la sala. Redirigiendo...');
   window.location.href = '/coinflip';
 }
-
 
 function getUsuarioID() {
   const id = localStorage.getItem('usuarioID');
@@ -20,37 +23,39 @@ function getUsuarioID() {
 
 const usuarioID = getUsuarioID();
 
+function actualizarInterfazSala(sala) {
+  document.getElementById('jugador-rojo').textContent = sala.creador;
+  document.getElementById('jugador-negro').textContent = sala.oponente || 'Esperando...';
+
+  const btnCancelar = document.getElementById('cancelar-btn');
+
+  if (usuarioID === Number(sala.id_jugador1)) {
+    btnCancelar.style.display = 'block';
+    btnCancelar.disabled = sala.id_jugador2 ? true : false;
+  } else {
+    btnCancelar.style.display = 'none';
+  }
+
+  if (!sala.id_jugador2) {
+    comenzarEspera();
+  }
+
+  if (sala.id_jugador1 === usuarioID && sala.id_jugador2) {
+    iniciarCoinflip(sala);
+  } else if (sala.id_jugador1 !== usuarioID && !sala.id_jugador2) {
+    unirseASala(idSala);
+  } else if (sala.id_ganador) {
+    iniciarCoinflip(sala);
+  }
+}
+
 fetch(`/coinflip/sala/${idSala}`)
   .then(res => {
     if (!res.ok) throw new Error('Sala no encontrada');
     return res.json();
   })
   .then(sala => {
-    document.getElementById('jugador-rojo').textContent = sala.creador;
-    document.getElementById('jugador-negro').textContent = sala.oponente || 'Esperando...';
-
-    const idJugador1 = Number(sala.id_jugador1);
-    const idJugador2 = sala.id_jugador2 ? Number(sala.id_jugador2) : null;
-
-    if (idJugador1 === usuarioID && !idJugador2) {
-      document.getElementById('cancelar-btn').style.display = 'block';
-    } else {
-      document.getElementById('cancelar-btn').style.display = 'none';
-      }
-
-
-    
-    if (!sala.id_jugador2) {
-      comenzarEspera();
-    }
-
-    if (sala.id_jugador1 === usuarioID && sala.id_jugador2) {
-      iniciarCoinflip(sala);
-    } else if (sala.id_jugador1 !== usuarioID && !sala.id_jugador2) {
-      unirseASala(idSala);
-    } else if (sala.id_ganador) {
-      iniciarCoinflip(sala);
-    }
+    actualizarInterfazSala(sala);
   })
   .catch(err => {
     console.error(err);
@@ -59,30 +64,29 @@ fetch(`/coinflip/sala/${idSala}`)
   });
 
 function unirseASala(id) {
+  console.log("Enviando solicitud para unirse a la sala...", usuarioID, id);
   fetch('/coinflip/unirse', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id_usuario: usuarioID, id_sala_juego1: idSala })
+    body: JSON.stringify({ id_usuario: usuarioID, id_sala_juego1: id })
   })
   .then(res => res.json())
   .then(data => {
-    if (data.status === 'ok') {
-      iniciarCoinflip({
-        id_jugador1: data.id_jugador1,
-        id_jugador2: data.id_jugador2,
-        cant_apostada: data.cant,
-        id_sala_juego1: idSala,
-        id_ganador: data.ganador,
-        creador: data.creador,
-        oponente: data.oponente
-      });
+    if (data.status === 'ok' || data.status === 'resuelto') {
+      // Volver a obtener los datos actualizados de la sala
+      fetch(`/coinflip/sala/${id}`)
+        .then(res => res.json())
+        .then(salaActualizada => {
+          actualizarInterfazSala(salaActualizada); // Esto ahora incluye el estado actualizado del botón
+        });
     } else {
       alert('Error: ' + (data.error || 'No se pudo unir'));
     }
   })
-  .catch(err => {console.error('Error al unirse a sala:', err);
-    alert('Error al unirse a sala: ' + err.message);});
-  console.log("Enviando solicitud para unirse a la sala...", usuarioID, idSala);
+  .catch(err => {
+    console.error('Error al unirse a sala:', err);
+    alert('Error al unirse a sala: ' + err.message);
+  });
 }
 
 function comenzarPartida(ganoRojo) {
@@ -97,48 +101,29 @@ function comenzarEspera() {
   moneda.style.transform = 'rotateY(0deg)';
 }
 
-
 function iniciarCoinflip(sala) {
-  // Actualizar nombres
   document.getElementById('jugador-rojo').textContent = sala.id_jugador1 === usuarioID ? 'Tú' : sala.creador || 'Jugador Rojo';
   document.getElementById('jugador-negro').textContent = sala.id_jugador2 === usuarioID ? 'Tú' : sala.oponente || 'Jugador Negro';
 
   if (!sala.id_jugador2) {
-    // Si NO hay segundo jugador, mostrar animación esperando
     comenzarEspera();
   } else if (!sala.id_ganador) {
-    // Si hay 2 jugadores pero no hay ganador, mostrar moneda estática (sin animación)
     const moneda = document.getElementById('moneda');
     moneda.style.animation = 'none';
     moneda.style.transform = 'rotateY(0deg)';
   } else {
-    // Ya hay ganador, mostrar resultado
     const ganoRojo = sala.id_ganador === sala.id_jugador1;
     comenzarPartida(ganoRojo);
   }
-}
-
-function comenzarPartida(ganoRojo) {
-  const moneda = document.getElementById('moneda');
-  moneda.style.animation = 'none'; // detiene animación
-  moneda.style.transform = ganoRojo ? 'rotateY(0deg)' : 'rotateY(180deg)';
-}
-
-function comenzarEspera() {
-  const moneda = document.getElementById('moneda');
-  moneda.style.animation = 'girarMoneda 1s linear infinite';
-  moneda.style.transform = 'rotateY(0deg)';
 }
 
 function volverAlInicio() {
   if (typeof cargarPagina === 'function') {
     cargarPagina('pagina2-juego1.html', '/coinflip');
   } else {
-    window.location.href = '/coinflip'; // Fallback en caso de error
+    window.location.href = '/coinflip'; // Fallback
   }
 }
-
-
 
 function cancelarPartida() {
   fetch('/coinflip/cancelar', {
@@ -150,9 +135,7 @@ function cancelarPartida() {
     })
   })
   .then(res => {
-    if (!res.ok) {
-      throw new Error('No se pudo cancelar la sala');
-    }
+    if (!res.ok) throw new Error('No se pudo cancelar la sala');
     return res.json();
   })
   .then(data => {

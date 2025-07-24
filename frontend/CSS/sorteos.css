@@ -1,0 +1,66 @@
+/* CSS/sorteos.css */
+
+.sorteo-div {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-image: url('../fondos/fondo.jpg'); /* cambiá el path si es necesario */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #fff;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+}
+
+#contenedor-sorteos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.sorteo-card {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid #4CAF50;
+  padding: 15px;
+  margin: 10px;
+  width: 80%;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.boton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.boton:hover {
+  background-color: #45a049;
+}
+
+#createContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+
+#crearMenu {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #4CAF50;
+  margin-top: 10px;
+}

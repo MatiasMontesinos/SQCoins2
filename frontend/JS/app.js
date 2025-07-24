@@ -26,6 +26,26 @@ function cargarPagina(archivo, url) {
         document.body.appendChild(script);
       }
 
+            if (archivo === 'pagina3-juego2.html') {
+        const script = document.createElement('script');
+        script.src = 'JS/buscaminas.js'; // tu archivo JS del buscaminas
+        script.onload = () => {
+          if (typeof window.iniciarBuscaminas === 'function') {
+            window.iniciarBuscaminas();
+          }
+        };
+        document.body.appendChild(script);
+
+        return; // para que no se ejecute más código en este .then
+      }
+
+      if (archivo === 'pagina4-sorteo.html') {
+        const script = document.createElement('script');
+        script.src = 'JS/sorteos.js';  // Pon aquí el nombre correcto de tu archivo JS para sorteos
+        document.body.appendChild(script);
+      }
+
+
     })
     .catch(() => {
       document.getElementById('contenido').innerHTML = '<p>Error al cargar la página.</p>';

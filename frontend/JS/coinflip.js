@@ -1,19 +1,13 @@
 (function() {
-    // Busca el botón y el menú
     const CreateButton = document.getElementById("CreateButton");
-    const createMenu = document.getElementById("createMenu"); // Asegúrate de que este ID exista en tu HTML
+    const createMenu = document.getElementById("createMenu");
 
-    // Solo si el botón y el menú existen, adjuntamos el event listener
     if (CreateButton && createMenu) {
         function toggleMenu() {
-            if (createMenu.style.display === 'block') {
-                createMenu.style.display = 'none';
-            } else {
-                createMenu.style.display = 'block';
-            }
+            createMenu.style.display = (createMenu.style.display === 'block') ? 'none' : 'block';
         }
         CreateButton.addEventListener("click", toggleMenu);
-        document.getElementById('CrearSala').addEventListener('click', crearSala)
+        document.getElementById('CrearSala').addEventListener('click', crearSala);
     }
 })();
 
@@ -21,7 +15,7 @@ fetch('/coinflip/salas')
   .then(res => res.json())
   .then(salas => {
     const contenedor = document.getElementById('salas');
-    contenedor.innerHTML = ''; // limpiar
+    contenedor.innerHTML = '';
 
     if (salas.length === 0) {
       contenedor.innerHTML = '<p>No hay salas activas.</p>';
@@ -37,7 +31,6 @@ fetch('/coinflip/salas')
         <p><strong>Apuesta:</strong> ${sala.cant_apostada} SQCoins</p>
         <button onclick="unirseASalaSPA(${sala.id_sala_juego1})">Unirse</button>
       `;
-
 
       contenedor.appendChild(div);
     });
@@ -55,23 +48,26 @@ function crearSala() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id_usuario: getUsuarioID(),  // Asegúrate que esta función exista y devuelva el ID correcto
+      id_usuario: getUsuarioID(),
       monto: monto
     })
   })
   .then(res => res.json())
   .then(data => {
-  if (data.status === 'sala_creada') {
-    localStorage.setItem('salaCoinflip', data.sala.id_sala_juego1); // guarda ID de sala
-    cargarPagina('coinflip-juego.html', '/coinflip-juego'); // navega dentro del SPA
-  } else {
-    alert('Error creando sala: ' + (data.error || 'desconocido'));
-  }
-})
+    if (data.status === 'sala_creada') {
+      if (data.sala && data.sala.id_sala_juego1) {
+        localStorage.setItem('salaCoinflip', data.sala.id_sala_juego1);
+        cargarPagina('coinflip-juego.html', '/coinflip-juego');
+      } else {
+        alert('Error: ID de sala no disponible.');
+      }
+    } else {
+      alert('Error creando sala: ' + (data.error || 'desconocido'));
+    }
+  })
   .catch(err => console.error('Error al crear sala:', err));
 }
 
-//A IMPLEMENTAR, se necesita que se guarde en localStorage el id del usuario cuando hace el login
 function getUsuarioID() {
   const id = localStorage.getItem('usuarioID');
   if (!id) {
@@ -82,6 +78,10 @@ function getUsuarioID() {
 }
 
 function unirseASalaSPA(idSala) {
-  localStorage.setItem('salaCoinflip', idSala); // guardamos ID de sala
-  cargarPagina('coinflip-juego.html', '/coinflip-juego'); // navegamos al juego
+  if (idSala) {
+    localStorage.setItem('salaCoinflip', idSala);
+    cargarPagina('coinflip-juego.html', '/coinflip-juego');
+  } else {
+    alert('Error: ID de sala no válido.');
+  }
 }
