@@ -8,16 +8,28 @@ const app = express();
 const frontendPath = path.join(__dirname, '../frontend');
 
 app.use(express.static(frontendPath));
-app.use(express.json()); // para parsear JSON en POST
+app.use(express.json());
 
-// Montar rutas perfil con prefijo /api
+const session = require('express-session');
+
+app.use(session({
+  secret: 'clave_secreta_muy_segura_aqui', // cambia por algo seguro
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 1 día en ms
+    httpOnly: true,
+    // secure: true, // activa solo si usas HTTPS
+  }
+}));
+
+
 app.use('/api', perfilRoutes);
 
 initDb()
   .then(() => {
     console.log('Base de datos inicializada correctamente');
 
-    // Enviar index.html para cualquier ruta no API
     app.get('*', (req, res) => {
       res.sendFile(path.join(frontendPath, 'index.html'));
     });

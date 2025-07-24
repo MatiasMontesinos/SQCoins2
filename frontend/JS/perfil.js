@@ -1,16 +1,16 @@
 function inicializarPerfil() {
-  console.log('Perfil inicializado') // CONSOLE LOG
+  verificarSesion();
+
   const perfilContainer = document.querySelector('.perfil-container');
   const contenidoPostLogin = document.getElementById('contenidoPostLogin');
   const nombreUsuarioSpan = document.getElementById('nombreUsuario');
-  const apodoUsuarioSpan = document.getElementById('apodoUsuario');
+  const usernameUsuarioSpan = document.getElementById('usernameUsuario');
   const fechaNacimientoUsuarioSpan = document.getElementById('fechaNacimientoUsuario');
   const monedasUsuarioSpan = document.getElementById('monedasUsuario');
+  const errorEdad = document.getElementById('errorEdad');
 
   // Registro
   const formRegistro = document.getElementById('formRegistro');
-  const errorEdad = document.getElementById('errorEdad');
-
   formRegistro.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -28,7 +28,7 @@ function inicializarPerfil() {
 
     const datosRegistro = {
       nombre: formRegistro.nombre.value.trim(),
-      apodo: formRegistro.apellido.value.trim(),
+      username: formRegistro.username.value.trim(),
       fechaNacimiento: formRegistro.fechaNacimiento.value,
       password: formRegistro.passwordRegistro.value
     };
@@ -37,20 +37,14 @@ function inicializarPerfil() {
       const res = await fetch('/api/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosRegistro)
+        body: JSON.stringify(datosRegistro),
+        credentials: 'include'
       });
       const data = await res.json();
 
       if (res.ok) {
         alert('Registro exitoso!');
-
-        nombreUsuarioSpan.textContent = data.usuario.nombre;
-        apodoUsuarioSpan.textContent = data.usuario.apodo;
-        fechaNacimientoUsuarioSpan.textContent = data.usuario.fechaNacimiento;
-        monedasUsuarioSpan.textContent = data.usuario.monedasTotales || '0';
-
-        perfilContainer.style.display = 'none';
-        contenidoPostLogin.style.display = 'block';
+        mostrarUsuario(data.usuario);
       } else {
         alert(data.error || 'Error al registrar');
       }
@@ -62,12 +56,11 @@ function inicializarPerfil() {
 
   // Login
   const formLogin = document.getElementById('formLogin');
-
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const datosLogin = {
-      nombre: formLogin.nombreLogin.value.trim(),
+      username: formLogin.usernameLogin.value.trim(),
       password: formLogin.passwordLogin.value
     };
 
@@ -75,27 +68,14 @@ function inicializarPerfil() {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosLogin)
+        body: JSON.stringify(datosLogin),
+        credentials: 'include'
       });
       const data = await res.json();
 
       if (res.ok) {
         alert('Ingreso exitoso!');
-
-        if (data.usuario) {
-          nombreUsuarioSpan.textContent = data.usuario.nombre;
-          apodoUsuarioSpan.textContent = data.usuario.apodo;
-          fechaNacimientoUsuarioSpan.textContent = data.usuario.fechaNacimiento;
-          monedasUsuarioSpan.textContent = data.usuario.monedasTotales || '0';
-        } else {
-          nombreUsuarioSpan.textContent = datosLogin.nombre;
-          apodoUsuarioSpan.textContent = '-';
-          fechaNacimientoUsuarioSpan.textContent = '-';
-          monedasUsuarioSpan.textContent = '0';
-        }
-
-        perfilContainer.style.display = 'none';
-        contenidoPostLogin.style.display = 'block';
+        mostrarUsuario(data.usuario);
       } else {
         alert(data.error || 'Error al iniciar sesión');
       }
@@ -104,9 +84,63 @@ function inicializarPerfil() {
       console.error(error);
     }
   });
+
+  // Logout botón
+  const btnLogout = document.getElementById('btnLogout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      try {
+        await fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        alert('Sesión cerrada correctamente');
+        mostrarFormulario();
+      } catch (error) {
+        alert('Error cerrando sesión');
+        console.error(error);
+      }
+    });
+  }
 }
 
-// Comandos para editar perfil post log in
+async function verificarSesion() {
+  try {
+    const res = await fetch('/api/sesion-activa', { credentials: 'include' });
+    if (res.ok) {
+      const data = await res.json();
+      mostrarUsuario(data.usuario);
+    } else {
+      mostrarFormulario();
+    }
+  } catch {
+    mostrarFormulario();
+  }
+}
+
+function mostrarUsuario(usuario) {
+  const perfilContainer = document.querySelector('.perfil-container');
+  const contenidoPostLogin = document.getElementById('contenidoPostLogin');
+  const nombreUsuarioSpan = document.getElementById('nombreUsuario');
+  const usernameUsuarioSpan = document.getElementById('usernameUsuario');
+  const fechaNacimientoUsuarioSpan = document.getElementById('fechaNacimientoUsuario');
+  const monedasUsuarioSpan = document.getElementById('monedasUsuario');
+
+  nombreUsuarioSpan.textContent = usuario.nombre;
+  usernameUsuarioSpan.textContent = usuario.username;
+  fechaNacimientoUsuarioSpan.textContent = usuario.fechaNacimiento;
+  monedasUsuarioSpan.textContent = usuario.monedasTotales || '0';
+
+  perfilContainer.style.display = 'none';
+  contenidoPostLogin.style.display = 'block';
+}
+
+function mostrarFormulario() {
+  document.querySelector('.perfil-container').style.display = 'block';
+  document.getElementById('contenidoPostLogin').style.display = 'none';
+}
+
+// --- Aquí sigue tu función para editar username (sin cambios) ---
 
 function inicializarEventosPerfil() {
   const nombreUsuarioSpan = document.getElementById('nombreUsuario');
@@ -114,16 +148,16 @@ function inicializarEventosPerfil() {
   const formEditar = document.getElementById('formEditar');
   const btnConfirmar = document.getElementById('btnConfirmar');
   const btnCancelar = document.getElementById('btnCancelar');
-  const nuevoApodoInput = document.getElementById('nuevoApodo');
-  const apodoUsuarioSpan = document.getElementById('apodoUsuario');
+  const nuevoUsernameInput = document.getElementById('nuevoUsername');
+  const usernameUsuarioSpan = document.getElementById('usernameUsuario');
 
   if (!btnEditar) return;
 
   btnEditar.addEventListener('click', () => {
     btnEditar.style.display = 'none';
     formEditar.style.display = 'block';
-    nuevoApodoInput.value = apodoUsuarioSpan.textContent.trim();
-    nuevoApodoInput.focus();
+    nuevoUsernameInput.value = usernameUsuarioSpan.textContent.trim();
+    nuevoUsernameInput.focus();
   });
 
   btnCancelar.addEventListener('click', () => {
@@ -132,36 +166,37 @@ function inicializarEventosPerfil() {
   });
 
   btnConfirmar.addEventListener('click', () => {
-    const nuevoApodo = nuevoApodoInput.value.trim();
+    const nuevoUsername = nuevoUsernameInput.value.trim();
 
-    if (nuevoApodo === '') {
-      alert('El apodo no puede estar vacío.');
+    if (nuevoUsername === '') {
+      alert('El username no puede estar vacío.');
       return;
     }
 
-    fetch('/api/actualizar-apodo', {
+    fetch('/api/actualizar-username', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
         nombre: nombreUsuarioSpan.textContent.trim(),
-        nuevoApodo 
-      })
+        nuevoUsername 
+      }),
+      credentials: 'include'
     })
       .then((res) => {
-        if (!res.ok) throw new Error('Error al actualizar el apodo');
+        if (!res.ok) throw new Error('Error al actualizar el username');
         return res.json();
       })
       .then((data) => {
-        apodoUsuarioSpan.textContent = nuevoApodo;
+        usernameUsuarioSpan.textContent = nuevoUsername;
         formEditar.style.display = 'none';
         btnEditar.style.display = 'inline-block';
-        alert('Apodo actualizado con éxito.');
+        alert('Username actualizado con éxito.');
       })
       .catch((err) => {
         console.error(err);
-        alert('No se pudo actualizar el apodo.');
+        alert('No se pudo actualizar el username.');
       });
   });
 }

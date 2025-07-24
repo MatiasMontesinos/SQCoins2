@@ -5,11 +5,7 @@ function cargarPagina(archivo, url) {
       document.getElementById('contenido').innerHTML = html;
       
       // Si cargamos perfil, ejecutamos el script para inicializarlo
-      if (archivo === 'pagina5-perfil.html') {
-        if (typeof inicializarPerfil === 'function') {
-          inicializarPerfil();
-        }
-      }
+     
       if (archivo === 'pagina5-perfil.html') {
         if (typeof inicializarPerfil === 'function') {
            inicializarPerfil();

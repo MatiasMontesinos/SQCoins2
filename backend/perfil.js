@@ -4,68 +4,64 @@ const { initDb } = require('./db');
 
 const router = express.Router();
 
+// Registro
 router.post('/registro', async (req, res) => {
   const connection = await initDb();
-  const { nombre, apodo, fechaNacimiento, password } = req.body;
+  const { nombre, username, fechaNacimiento, password } = req.body;
 
-  console.log(">> POST /api/registro recibido:", req.body);
-
-  if (!nombre || !apodo || !fechaNacimiento || !password) {
+  if (!nombre || !username || !fechaNacimiento || !password) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
   try {
     const [rows] = await connection.execute(
-      'SELECT * FROM usuarios WHERE nombre = ? AND apodo = ?',
-      [nombre, apodo]
+      'SELECT * FROM usuarios WHERE username = ?',
+      [username]
     );
 
     if (rows.length > 0) {
-      return res.status(409).json({ error: 'Usuario ya registrado' });
+      return res.status(409).json({ error: 'El username ya está registrado' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insertar nuevo usuario con monedas totales inicializadas a 100
     await connection.execute(
-      'INSERT INTO usuarios (nombre, apodo, fechaNacimiento, password, monedasTotales) VALUES (?, ?, ?, ?, 100)',
-      [nombre, apodo, fechaNacimiento, hashedPassword]
+      'INSERT INTO usuarios (nombre, username, fechaNacimiento, password, monedasTotales) VALUES (?, ?, ?, ?, 100)',
+      [nombre, username, fechaNacimiento, hashedPassword]
     );
 
-    // Obtener datos del usuario recién insertado (para devolverlos)
-    const [newUserRows] = await connection.execute(
-      'SELECT nombre, apodo, fechaNacimiento, monedasTotales FROM usuarios WHERE nombre = ? AND apodo = ?',
-      [nombre, apodo]
+    const [newUser] = await connection.execute(
+      'SELECT nombre, username, fechaNacimiento, monedasTotales FROM usuarios WHERE username = ?',
+      [username]
     );
 
-    const usuario = newUserRows[0];
+    // Guardar usuario en sesión
+    req.session.usuario = newUser[0];
 
-    return res.json({
-      message: 'Usuario registrado correctamente',
-      usuario: usuario
-    });
+    return res.json({ message: 'Registro exitoso', usuario: newUser[0] });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error en la base de datos' });
   }
 });
 
+// Login
 router.post('/login', async (req, res) => {
   const connection = await initDb();
-  const { nombre, password } = req.body;
+  const { username, password } = req.body;
 
-  if (!nombre || !password) {
-    return res.status(400).json({ error: 'Nombre y contraseña son obligatorios' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username y contraseña son obligatorios' });
   }
 
   try {
     const [rows] = await connection.execute(
-      'SELECT * FROM usuarios WHERE nombre = ?',
-      [nombre]
+      'SELECT * FROM usuarios WHERE username = ?',
+      [username]
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: 'Usuario no registrado, debe registrarse primero' });
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
     const usuario = rows[0];
@@ -75,15 +71,17 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Retornar info del usuario (sin password)
+    // Guardar usuario en sesión
+    req.session.usuario = {
+      nombre: usuario.nombre,
+      username: usuario.username,
+      fechaNacimiento: usuario.fechaNacimiento,
+      monedasTotales: usuario.monedasTotales || 0
+    };
+
     return res.json({
       message: 'Ingreso correcto',
-      usuario: {
-        nombre: usuario.nombre,
-        apodo: usuario.apodo,
-        fechaNacimiento: usuario.fechaNacimiento,
-        monedas: usuario.monedasTotales || 0
-      }
+      usuario: req.session.usuario
     });
   } catch (error) {
     console.error(error);
@@ -91,26 +89,65 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Ruta para actualizar apodo (requiere que el usuario esté logueado)
-router.post('/actualizar-apodo', async (req, res) => {
+// Actualizar username
+router.post('/actualizar-username', async (req, res) => {
   const connection = await initDb();
-  const { nuevoApodo, nombre } = req.body;
+  const { nuevoUsername } = req.body;
 
-  if (!nuevoApodo || !nombre) {
-    return res.status(400).json({ error: 'Faltan datos para actualizar apodo' });
+  if (!nuevoUsername) {
+    return res.status(400).json({ error: 'Falta el nuevo username' });
+  }
+
+  if (!req.session.usuario) {
+    return res.status(401).json({ error: 'No autenticado' });
   }
 
   try {
-    await connection.execute(
-      'UPDATE usuarios SET apodo = ? WHERE nombre = ?',
-      [nuevoApodo, nombre]
+    // Verificar si el nuevo username ya existe
+    const [existing] = await connection.execute(
+      'SELECT * FROM usuarios WHERE username = ?',
+      [nuevoUsername]
     );
 
-    return res.json({ message: 'Apodo actualizado correctamente', apodo: nuevoApodo });
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'El username ya está en uso' });
+    }
+
+    // Actualizar usando el username actual en sesión
+    const currentUsername = req.session.usuario.username;
+
+    await connection.execute(
+      'UPDATE usuarios SET username = ? WHERE username = ?',
+      [nuevoUsername, currentUsername]
+    );
+
+    // Actualizar la sesión con el nuevo username
+    req.session.usuario.username = nuevoUsername;
+
+    return res.json({ message: 'Username actualizado correctamente', username: nuevoUsername });
   } catch (error) {
-    console.error('Error al actualizar apodo:', error);
-    return res.status(500).json({ error: 'Error al actualizar apodo' });
+    console.error('Error al actualizar username:', error);
+    return res.status(500).json({ error: 'Error al actualizar username' });
   }
+});
+
+// Ruta para verificar si hay sesión activa
+router.get('/sesion-activa', (req, res) => {
+  if (req.session.usuario) {
+    res.json({ usuario: req.session.usuario });
+  } else {
+    res.status(401).json({ error: 'No autenticado' });
+  }
+});
+
+// Ruta para cerrar sesión
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ error: 'Error cerrando sesión' });
+    }
+    res.json({ mensaje: 'Sesión cerrada correctamente' });
+  });
 });
 
 module.exports = router;

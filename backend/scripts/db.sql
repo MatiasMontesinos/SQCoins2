@@ -6,11 +6,11 @@ USE sqcoins;
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    apodo VARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL,
     fechaNacimiento DATE NOT NULL,
     password VARCHAR(255) NOT NULL,
     monedasTotales INT NOT NULL DEFAULT 100,
-    UNIQUE KEY unique_user (nombre, apodo),
+    UNIQUE KEY unique_user (username),
 
     cant_apostada_juego1 INT NOT NULL DEFAULT 0,
     cant_ganada_juego1 INT NOT NULL DEFAULT 0,
