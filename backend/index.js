@@ -13,7 +13,7 @@ app.use(express.json());
 const session = require('express-session');
 
 app.use(session({
-  secret: 'clave_secreta_muy_segura_aqui', // cambia por algo seguro
+  secret: 'pagina_web_sqcoins_trabajo_practico_facultad', // clave de seguridad puesta para firmar la cookite
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -43,3 +43,5 @@ initDb()
     console.error('Error al inicializar la base de datos:', err);
     process.exit(1);
   });
+
+require('./coinflip')(app, frontendPath);

@@ -1,0 +1,138 @@
+
+.container-todo{
+  margin: 0;
+  padding: 0;
+  background: url('../imagenes/fondo.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+  color: white;
+  height: 100vh;
+}
+
+/* Contenedor principal para centrar todo */
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 40px;
+}
+
+/* Contenedor nombres */
+.info-jugadores {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+/* Nombres jugadores */
+.jugador {
+  padding: 10px 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.5);
+  min-width: 120px;
+  text-align: center;
+  user-select: none;
+}
+
+.jugador.rojo {
+  color: #ff4444;
+  background-color: rgba(255, 0, 0, 0.6);
+}
+
+.jugador.negro {
+  color: #222;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Botones */
+.boton-salir {
+  position: fixed;
+  bottom: 20px;
+  background-color: #d00;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.boton-salir:hover {
+  background-color: #a00;
+}
+
+.boton-salir.izq {
+  left: 20px;
+}
+
+.boton-salir.der {
+  right: 20px;
+}
+
+/* Moneda */
+.moneda-container {
+  perspective: 1000px;
+  width: 150px;
+  height: 150px;
+}
+
+.moneda {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: girarMoneda 1s linear infinite;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0,0,0,0.7);
+  cursor: default;
+}
+
+/* Caras */
+.cara {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  backface-visibility: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  user-select: none;
+  text-shadow: 1px 1px 2px black;
+}
+
+.cara-roja {
+  background-color: #ff4444;
+  color: white;
+  transform: rotateY(0deg);
+}
+
+.cara-negra {
+  background-color: #222;
+  color: white;
+  transform: rotateY(180deg);
+}
+
+/* Animación giro */
+@keyframes girarMoneda {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}

@@ -1,6 +1,36 @@
 function inicializarPerfil() {
   verificarSesion();
 
+  // Para eliminar usuario
+  const btnEliminarCuenta = document.getElementById('btnEliminarCuenta');
+  if (btnEliminarCuenta) {
+    btnEliminarCuenta.addEventListener('click', async () => {
+    const confirmar = confirm('¿Estás seguro que querés eliminar tu cuenta? Esta acción no se puede deshacer.');
+
+    if (!confirmar) return;
+
+    try {
+      const res = await fetch('/api/eliminar-cuenta', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Tu cuenta fue eliminada correctamente.');
+        mostrarFormulario(); // vuelve al formulario de login/registro
+      } else {
+        alert(data.error || 'Error al eliminar la cuenta.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error en la conexión al intentar eliminar la cuenta.');
+    }
+  });
+}
+
+
   const perfilContainer = document.querySelector('.perfil-container');
   const contenidoPostLogin = document.getElementById('contenidoPostLogin');
   const nombreUsuarioSpan = document.getElementById('nombreUsuario');
@@ -119,6 +149,10 @@ async function verificarSesion() {
 }
 
 function mostrarUsuario(usuario) {
+  if (usuario.id) {
+    localStorage.setItem('usuarioID', usuario.id);
+  }
+
   const perfilContainer = document.querySelector('.perfil-container');
   const contenidoPostLogin = document.getElementById('contenidoPostLogin');
   const nombreUsuarioSpan = document.getElementById('nombreUsuario');

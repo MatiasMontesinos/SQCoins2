@@ -3,39 +3,38 @@ const fs = require('fs');
 const path = require('path');
 
 const dbConfigNoDb = {
-  host: 'localhost',
-  user: 'root',
-  password: '1234mati',
+  host: process.env.DB_HOST || 'localhost',  // Usar variable de entorno o localhost
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '1234mati',
   port: 3306,
-  multipleStatements: true // Permite ejecutar varias sentencias juntas (útil para scripts .sql)
+  multipleStatements: true
 };
 
 const dbConfigWithDb = {
   ...dbConfigNoDb,
-  database: 'sqcoins'
+  database: process.env.DB_NAME || 'sqcoins'
 };
 
 let connection;
 
 async function initDb() {
   if (!connection) {
-    // 1) Conectarse SIN base de datos porque puede no existir
+    // 1) Conectarse sin base de datos (para crearla si hace falta)
     const connectionNoDb = await mysql.createConnection(dbConfigNoDb);
 
-    // 2) Crear la base de datos si no existe
-    await connectionNoDb.query('CREATE DATABASE IF NOT EXISTS sqcoins');
+    // 2) Crear la base si no existe
+    await connectionNoDb.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfigWithDb.database}\``);
 
-    // 3) Cerrar la conexión sin base
     await connectionNoDb.end();
 
-    // 4) Conectarse ya con la base de datos creada
+    // 3) Conectarse con la base ya creada
     connection = await mysql.createConnection(dbConfigWithDb);
 
-    // 5) Leer el script SQL para crear tablas
+    // 4) Leer script de creación de tablas
     const schemaPath = path.join(__dirname, 'scripts', 'db.sql');
-    let schemaSQL = fs.readFileSync(schemaPath, 'utf8');
+    const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
 
-    // 6) Ejecutar el script SQL (debe contener sólo las tablas, sin CREATE DATABASE ni USE)
+    // 5) Ejecutar script para tablas
     await connection.query(schemaSQL);
 
     console.log('Base y tablas inicializadas.');

@@ -31,7 +31,7 @@ router.post('/registro', async (req, res) => {
     );
 
     const [newUser] = await connection.execute(
-      'SELECT nombre, username, fechaNacimiento, monedasTotales FROM usuarios WHERE username = ?',
+      'SELECT id, nombre, username, fechaNacimiento, monedasTotales FROM usuarios WHERE username = ?',
       [username]
     );
 
@@ -73,6 +73,7 @@ router.post('/login', async (req, res) => {
 
     // Guardar usuario en sesión
     req.session.usuario = {
+      id: usuario.id,
       nombre: usuario.nombre,
       username: usuario.username,
       fechaNacimiento: usuario.fechaNacimiento,
@@ -149,5 +150,31 @@ router.post('/logout', (req, res) => {
     res.json({ mensaje: 'Sesión cerrada correctamente' });
   });
 });
+// Eliminar cuenta del usuario autenticado
+router.post('/eliminar-cuenta', async (req, res) => {
+  if (!req.session.usuario) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+
+  const connection = await initDb();
+  const { id } = req.session.usuario;
+
+  try {
+    // Eliminar usuario de la base de datos
+    await connection.execute('DELETE FROM usuarios WHERE id = ?', [id]);
+
+    // Destruir la sesión después de eliminar
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ error: 'Usuario eliminado, pero hubo error cerrando sesión' });
+      }
+      res.json({ mensaje: 'Usuario eliminado correctamente' });
+    });
+  } catch (error) {
+    console.error('Error eliminando usuario:', error);
+    res.status(500).json({ error: 'Error al eliminar usuario' });
+  }
+});
+
 
 module.exports = router;

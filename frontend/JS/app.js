@@ -3,8 +3,8 @@ function cargarPagina(archivo, url) {
     .then(res => res.text())
     .then(html => {
       document.getElementById('contenido').innerHTML = html;
-      
-      // Si cargamos perfil, ejecutamos el script para inicializarlo
+      history.pushState({ archivo }, '', url);
+      // Ejecutar scripts específicos según la página
      
       if (archivo === 'pagina5-perfil.html') {
         if (typeof inicializarPerfil === 'function') {
@@ -13,16 +13,30 @@ function cargarPagina(archivo, url) {
         if (typeof inicializarEventosPerfil === 'function') {
           inicializarEventosPerfil();
         }
-}
+      }
+      if (archivo === 'pagina2-juego1.html') {
+        const script = document.createElement('script');
+        script.src = 'JS/coinflip.js';
+        document.body.appendChild(script);
+      }      
 
+      if (archivo === 'coinflip-juego.html') {
+        const script = document.createElement('script');
+        script.src = 'JS/coinflip-juego.js';
+        document.body.appendChild(script);
+      }
 
-      history.pushState({ archivo }, '', url);
     })
     .catch(() => {
       document.getElementById('contenido').innerHTML = '<p>Error al cargar la página.</p>';
     });
 }
-
+function cargarScript(src) {
+  const script = document.createElement('script');
+  script.src = src;
+  script.defer = true;
+  document.body.appendChild(script);
+}
 
 // Escucha clics en cualquier enlace con data-pagina
 document.addEventListener('click', (e) => {
@@ -46,6 +60,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const rutas = {
         '/principal': 'pagina1-principal.html',
         '/coinflip': 'pagina2-juego1.html',
+        '/coinflip-juego': 'coinflip-juego.html',
         '/buscaminas': 'pagina3-juego2.html',
         '/sorteo': 'pagina4-sorteo.html',
         '/perfil': 'pagina5-perfil.html'
@@ -71,3 +86,5 @@ window.addEventListener('popstate', (e) => {
       });
   }
 });
+
+window.cargarPagina = cargarPagina;
