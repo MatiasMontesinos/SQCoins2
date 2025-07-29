@@ -1,102 +1,131 @@
-(function() {
+// frontend/JS/sorteo.js
+
+(function () {
+  const contenedor = document.getElementById('contenedor-sorteos');
+  if (!contenedor) return;
+
   const CreateButton = document.getElementById("CreateButton");
   const createMenu = document.getElementById("crearMenu");
-
   if (CreateButton && createMenu) {
     CreateButton.addEventListener("click", () => {
       createMenu.style.display = createMenu.style.display === 'block' ? 'none' : 'block';
     });
-
     document.getElementById('CrearSorteo').addEventListener('click', crearSorteo);
   }
-})();
 
-function listarSorteos() {
-  fetch('/api/sorteos/activos')
-    .then(res => res.json())
-    .then(sorteos => {
-      const contenedor = document.getElementById('sorteos');
-      contenedor.innerHTML = '';
+  listarSorteos();
+
+  async function listarSorteos() {
+    try {
+      const res = await fetch('/api/sorteos/activos');
+      if (!res.ok) throw new Error('Error al listar sorteos');
+      const sorteos = await res.json();
+      const cont = document.getElementById('sorteos');
+      cont.innerHTML = '';
+      const id_usuario = getUsuarioID();
 
       if (sorteos.length === 0) {
-        contenedor.innerHTML = '<p>No hay sorteos activos.</p>';
+        cont.innerHTML = '<p>No hay sorteos activos.</p>';
         return;
       }
 
       sorteos.forEach(s => {
+        const esCreador = s.id_creador === id_usuario;
         const div = document.createElement('div');
         div.className = 'sorteo-card';
+
         div.innerHTML = `
           <p><strong>Creador:</strong> ${s.creador}</p>
-          <p><strong>Cantidad sorteada:</strong> ${s.cantidad_sorteo} SQCoins</p>
+          <p><strong>Cantidad sorteada:</strong> <span id="cantidad-${s.id_sorteo}">${s.cantidad_sorteo}</span> SQCoins</p>
           <p><strong>Participantes:</strong> ${s.participantes}/${s.limite_participantes}</p>
+          ${esCreador ? `
+            <input type="number" id="nuevaCantidad-${s.id_sorteo}" placeholder="Nueva cantidad" min="${s.cantidad_sorteo}" />
+            <button onclick="actualizarCantidad(${s.id_sorteo})">Actualizar</button>
+          ` : ''}
           <button onclick="unirseSorteo(${s.id_sorteo})">Unirse</button>
         `;
-        contenedor.appendChild(div);
+        cont.appendChild(div);
       });
-    })
-    .catch(err => console.error('Error al listar sorteos:', err));
-}
-
-function crearSorteo() {
-  const cantidad = parseInt(document.getElementById('cantidadSortear').value);
-  const limite = parseInt(document.getElementById('limiteParticipantes').value);
-  const id_usuario = getUsuarioID();
-
-  if (!cantidad || !limite) {
-    alert("Completá todos los campos");
-    return;
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  fetch('/api/sorteos/crear', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      cantidad_sorteo: cantidad,
-      limite_participantes: limite,
-      id_creador: id_usuario
-    })
-  })
-  .then(async res => {
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error al crear sorteo');
-    alert('Sorteo creado con éxito');
-    location.reload();
-  })
-  .catch(err => {
-    console.error('Error al crear sorteo:', err);
-    alert(err.message || 'Error desconocido');
-  });
-}
-
-function unirseSorteo(idSorteo) {
-  const id_usuario = getUsuarioID();
-
-  fetch('/api/sorteos/unirse', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id_usuario, id_sorteo: idSorteo })
-  })
-  .then(async res => {
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error al unirse');
-    alert('¡Te uniste al sorteo!');
-    location.reload();
-  })
-  .catch(err => {
-    console.error('Error al unirse:', err);
-    alert(err.message || 'Error al unirse al sorteo');
-  });
-}
-
-function getUsuarioID() {
-  const id = localStorage.getItem('usuarioID');
-  if (!id) {
-    alert('Usuario no logueado.');
-    throw new Error('Usuario no logueado');
+  async function crearSorteo() {
+    const cantidad = parseInt(document.getElementById('cantidadSortear').value, 10);
+    const limite = parseInt(document.getElementById('limiteParticipantes').value, 10);
+    const id_usuario = getUsuarioID();
+    if (!cantidad || !limite) {
+      alert("Completá todos los campos");
+      return;
+    }
+    try {
+      const res = await fetch('/api/sorteos/crear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cantidad_sorteo: cantidad, limite_participantes: limite, id_creador: id_usuario })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      alert('Sorteo creado con éxito');
+      listarSorteos();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error desconocido');
+    }
   }
-  return parseInt(id);
-}
 
-// Carga inicial
-listarSorteos();
+  async function actualizarCantidad(idSorteo) {
+    const input = document.getElementById(`nuevaCantidad-${idSorteo}`);
+    const nuevaCantidad = parseInt(input.value, 10);
+    const id_usuario = getUsuarioID();
+    if (!nuevaCantidad) return alert("Ingresá una cantidad válida");
+
+    try {
+      const res = await fetch('/api/sorteos/actualizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_sorteo: idSorteo, nuevaCantidad, id_usuario })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      alert('Cantidad actualizada');
+      listarSorteos();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error al actualizar');
+    }
+  }
+
+  async function unirseSorteo(idSorteo) {
+    const id_usuario = getUsuarioID();
+    try {
+      const res = await fetch('/api/sorteos/unirse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_usuario, id_sorteo: idSorteo })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      alert('¡Te uniste al sorteo!');
+      listarSorteos();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error al unirse al sorteo');
+    }
+  }
+
+  function getUsuarioID() {
+    const id = localStorage.getItem('usuarioID');
+    if (!id) {
+      alert('Usuario no logueado.');
+      throw new Error('Usuario no logueado');
+    }
+    return parseInt(id, 10);
+  }
+
+  // Hacer públicas para HTML
+  window.unirseSorteo = unirseSorteo;
+  window.actualizarCantidad = actualizarCantidad;
+
+})();

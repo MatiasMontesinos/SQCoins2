@@ -132,12 +132,29 @@ router.post('/actualizar-username', async (req, res) => {
   }
 });
 
-// Ruta para verificar si hay sesión activa
-router.get('/sesion-activa', (req, res) => {
-  if (req.session.usuario) {
-    res.json({ usuario: req.session.usuario });
-  } else {
-    res.status(401).json({ error: 'No autenticado' });
+// Ruta para verificar si hay sesión activa (con salto a BD para traer saldo fresco)
+router.get('/sesion-activa', async (req, res) => {
+  if (!req.session.usuario) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+  try {
+    const connection = await initDb();
+    const userId = req.session.usuario.id;
+    const [rows] = await connection.execute(
+      'SELECT id, nombre, username, fechaNacimiento, monedasTotales FROM usuarios WHERE id = ?',
+      [userId]
+    );
+    if (rows.length === 0) {
+      // sesión inválida: destruimos y respondemos no autenticado
+      req.session.destroy(() => {});
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+    // Actualizamos la sesión con datos frescos
+    req.session.usuario = rows[0];
+    res.json({ usuario: rows[0] });
+  } catch (error) {
+    console.error('Error en sesion-activa:', error);
+    res.status(500).json({ error: 'Error interno' });
   }
 });
 
@@ -150,6 +167,7 @@ router.post('/logout', (req, res) => {
     res.json({ mensaje: 'Sesión cerrada correctamente' });
   });
 });
+
 // Eliminar cuenta del usuario autenticado
 router.post('/eliminar-cuenta', async (req, res) => {
   if (!req.session.usuario) {
@@ -175,6 +193,5 @@ router.post('/eliminar-cuenta', async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar usuario' });
   }
 });
-
 
 module.exports = router;

@@ -28,7 +28,7 @@ function cargarPagina(archivo, url) {
 
             if (archivo === 'pagina3-juego2.html') {
         const script = document.createElement('script');
-        script.src = 'JS/buscaminas.js'; // tu archivo JS del buscaminas
+        script.src = 'JS/buscaminas.js'; 
         script.onload = () => {
           if (typeof window.iniciarBuscaminas === 'function') {
             window.iniciarBuscaminas();
@@ -36,12 +36,12 @@ function cargarPagina(archivo, url) {
         };
         document.body.appendChild(script);
 
-        return; // para que no se ejecute más código en este .then
+        return; 
       }
 
       if (archivo === 'pagina4-sorteo.html') {
         const script = document.createElement('script');
-        script.src = 'JS/sorteos.js';  // Pon aquí el nombre correcto de tu archivo JS para sorteos
+        script.src = 'JS/sorteo.js'; 
         document.body.appendChild(script);
       }
 
