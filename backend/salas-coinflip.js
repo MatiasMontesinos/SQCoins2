@@ -236,6 +236,67 @@ async function coinflipHandler(req, res) {
   }
 }
 
+// Actualizar apuesta de sala existente
+async function actualizarSala(idSala, idJugador1, nuevoMonto) {
+  if (nuevoMonto < 1) throw new Error('El monto mínimo es 1');
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    // Bloquear sala
+    const [rows] = await conn.query(
+      'SELECT cant_apostada, id_jugador1, id_jugador2 FROM juego1 WHERE id_sala_juego1 = ? FOR UPDATE',
+      [idSala]
+    );
+    if (!rows.length) throw new Error('Sala no encontrada');
+    const sala = rows[0];
+    if (sala.id_jugador1 !== idJugador1) throw new Error('No eres el creador de la sala');
+    if (sala.id_jugador2) throw new Error('La sala ya tiene oponente');
+
+    // Bloquear usuario
+    const [usr] = await conn.query(
+      'SELECT monedasTotales FROM usuarios WHERE id = ? FOR UPDATE',
+      [idJugador1]
+    );
+    if (!usr.length) throw new Error('Usuario no encontrado');
+    const saldo = usr[0].monedasTotales;
+
+    const delta = nuevoMonto - sala.cant_apostada;
+    // Si aumenta la apuesta, verifica saldo suficiente
+    if (delta > 0 && saldo < delta) throw new Error('Saldo insuficiente para aumentar la apuesta');
+
+    // Ajustar saldo (puede restar o devolver)
+    await conn.query(
+      'UPDATE usuarios SET monedasTotales = monedasTotales - ? WHERE id = ?',
+      [delta, idJugador1]
+    );
+
+    // Actualizar el monto de la sala
+    await conn.query(
+      'UPDATE juego1 SET cant_apostada = ? WHERE id_sala_juego1 = ?',
+      [nuevoMonto, idSala]
+    );
+
+    await conn.commit();
+
+    // Devolver la sala actualizada
+    const [resSala] = await conn.query(
+      `SELECT j.*, u1.nombre AS creador, u2.nombre AS oponente
+       FROM juego1 j
+       JOIN usuarios u1 ON j.id_jugador1 = u1.id
+       LEFT JOIN usuarios u2 ON j.id_jugador2 = u2.id
+       WHERE j.id_sala_juego1 = ?`,
+      [idSala]
+    );
+    return resSala[0];
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
+}
+
 module.exports = {
   crearSala,
   listarSalasActivas,
@@ -244,5 +305,6 @@ module.exports = {
   manejarResolverCoinflip,
   cancelarSala,
   obtenerSalaPorID,
-  coinflipHandler
+  coinflipHandler,
+  actualizarSala
 };
