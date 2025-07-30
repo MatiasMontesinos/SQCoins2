@@ -44,7 +44,17 @@ function cargarPagina(archivo, url) {
         script.src = 'JS/sorteo.js'; 
         document.body.appendChild(script);
       }
-
+      if (archivo === 'pagina1-principal.html') {
+        // Cargar script para rankings y ejecutarlo
+        const script = document.createElement('script');
+        script.src = 'principal.js';  // Ruta relativa a frontend
+        script.onload = () => {
+          if (typeof cargarRankings === 'function') {
+            cargarRankings();
+          }
+        };
+        document.body.appendChild(script);
+      }
 
     })
     .catch(() => {

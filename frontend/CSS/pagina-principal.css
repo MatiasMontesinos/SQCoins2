@@ -15,6 +15,9 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+  position: relative;
+  top: -150px; /* sube el contenedor sin romper el flujo */
+  overflow: hidden;
 }
 
 /* Tarjetas */
@@ -63,7 +66,9 @@
 /* Botón */
 .button {
   padding: 10px 20px;
-  background-color: #3498db;
+  background: linear-gradient(90deg, #4dabf7, #1a8fff);
+  box-shadow: 0 4px 12px rgba(26, 143, 255, 0.7);
+  transition: all 0.3s ease;
   color: white;
   text-decoration: none;
   border-radius: 5px;
@@ -72,7 +77,9 @@
 }
 
 .button:hover {
-  background-color: #2980b9;
+  background: linear-gradient(90deg, #6ab8ff, #3a9fff); 
+  box-shadow: 0 6px 16px rgba(58, 159, 255, 0.8);
+  transform: translateY(-2px);
 }
 
 /* Estilos para las tablas de ranking */
@@ -80,7 +87,7 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  margin-top: 40px;
+  margin-top: -300px;
 }
 
 .stat-box {

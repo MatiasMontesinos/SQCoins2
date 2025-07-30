@@ -9,6 +9,9 @@ const { initDb } = require('./db');
 const perfilRoutes  = require('./perfil');
 const sorteosRoutes = require('./sorteos');
 const coinflipSetup = require('./coinflip');
+const principalRoutes = require('./principal');
+const buscaminasRoutes = require('./buscaminas');
+
 
 const app = express();
 const frontendPath = path.join(__dirname, '../frontend');
@@ -26,6 +29,9 @@ app.use(session({
 // Rutas API
 app.use('/api', perfilRoutes);            // /api/registro, /api/login, /api/sesion-activa, etc.
 app.use('/api/sorteos', sorteosRoutes);   // /api/sorteos/crear, /api/sorteos/activos, /api/sorteos/unirse
+app.use('/api', principalRoutes);
+app.use('/api', buscaminasRoutes);
+
 
 // Coinflip
 coinflipSetup(app, frontendPath);         // monta /coinflip/*

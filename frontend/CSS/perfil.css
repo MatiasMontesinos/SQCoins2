@@ -1,3 +1,7 @@
+.perfil-container {
+  margin-top: 80px; /* Ajusta el valor según la altura de tu navbar */
+}
+
 .formulario-registro, .formulario-login {
   width: 300px;
   margin: 20px auto;

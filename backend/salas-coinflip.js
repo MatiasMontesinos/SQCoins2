@@ -127,7 +127,7 @@ async function unirseASala(idSala, idJugador2) {
     ]);
 
     const [resNombres] = await connection.query(`
-      SELECT u1.nombre AS creador, u2.nombre AS oponente
+      SELECT u1.username AS creador, u2.username AS oponente
       FROM juego1 j
       JOIN usuarios u1 ON j.id_jugador1 = u1.id
       LEFT JOIN usuarios u2 ON j.id_jugador2 = u2.id
@@ -210,7 +210,7 @@ async function cancelarSala(idSala, idUsuario) {
 async function obtenerSalaPorID(idSala) {
   const [rows] = await pool.query(`
     SELECT j.id_sala_juego1, j.cant_apostada, j.id_jugador1, j.id_jugador2,
-           u1.nombre AS creador, u2.nombre AS oponente,
+           u1.username AS creador, u2.username AS oponente,
            j.id_ganador, j.resuelto
     FROM juego1 j
     JOIN usuarios u1 ON j.id_jugador1 = u1.id
@@ -281,7 +281,7 @@ async function actualizarSala(idSala, idJugador1, nuevoMonto) {
 
     // Devolver la sala actualizada
     const [resSala] = await conn.query(
-      `SELECT j.*, u1.nombre AS creador, u2.nombre AS oponente
+      `SELECT j.*, u1.username AS creador, u2.username AS oponente
        FROM juego1 j
        JOIN usuarios u1 ON j.id_jugador1 = u1.id
        LEFT JOIN usuarios u2 ON j.id_jugador2 = u2.id
