@@ -1,10 +1,7 @@
-/* CSS/sorteos.css */
-
 .sorteo-div {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background-image: url('../fondos/fondo.jpg'); /* cambiá el path si es necesario */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -13,7 +10,7 @@
 
 h1 {
   text-align: center;
-  margin-top: 20px;
+  margin: 0; 
   color: white;
 }
 
@@ -26,12 +23,39 @@ h1 {
 
 .sorteo-card {
   background-color: rgba(0, 0, 0, 0.6);
-  border: 2px solid #4CAF50;
+  backdrop-filter: blur(5px);
+  border: 1px solid #4CAF50;
   padding: 15px;
-  margin: 10px;
+  margin: 10px 0;
   width: 80%;
   border-radius: 10px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sorteo-card p {
+  margin: 0 10px 10px 0;
+}
+
+.sorteo-card input {
+  padding: 5px;
+  margin-right: 8px;
+}
+
+.sorteo-card button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  margin: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.sorteo-card button:hover {
+  background-color: #45a049;
 }
 
 .boton {
@@ -52,15 +76,47 @@ h1 {
 
 #createContainer {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 100px; /* distancia desde arriba */
+  right: 30px; /* distancia desde la derecha */
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
+
+#CreateButton {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: background-color 0.3s;
+  z-index: 1001;
+}
+
+#CreateButton:hover {
+  background-color: #218838;
+}
+
+
 
 #crearMenu {
   display: none;
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 15px;
-  border-radius: 10px;
-  border: 2px solid #4CAF50;
-  margin-top: 10px;
+  margin-top: 5px;
+  background-color: rgba(0,0,0,0.9);
+  padding: 10px;
+  border-radius: 8px;
 }
+
+#crearMenu input {
+  margin: 5px 0;
+  padding: 8px;
+  width: 200px;
+  border-radius: 5px;
+  border: none;
+}
+
+

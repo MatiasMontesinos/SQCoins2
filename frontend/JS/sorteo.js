@@ -35,15 +35,20 @@
         div.className = 'sorteo-card';
 
         div.innerHTML = `
-          <p><strong>Creador:</strong> ${s.creador}</p>
-          <p><strong>Cantidad sorteada:</strong> <span id="cantidad-${s.id_sorteo}">${s.cantidad_sorteo}</span> SQCoins</p>
-          <p><strong>Participantes:</strong> ${s.participantes}/${s.limite_participantes}</p>
+        <div>
+            <p><strong>Creador:</strong> ${s.creador}</p>
+            <p><strong>Cantidad sorteada:</strong> <span id="cantidad-${s.id_sorteo}">${s.cantidad_sorteo}</span> SQCoins</p>
+            <p><strong>Participantes:</strong> ${s.participantes}/${s.limite_participantes}</p>
+        </div>
+        <div>
           ${esCreador ? `
             <input type="number" id="nuevaCantidad-${s.id_sorteo}" placeholder="Nueva cantidad" min="${s.cantidad_sorteo}" />
             <button onclick="actualizarCantidad(${s.id_sorteo})">Actualizar</button>
+            <button onclick="eliminarSorteo(${s.id_sorteo})">Eliminar</button>
           ` : ''}
           <button onclick="unirseSorteo(${s.id_sorteo})">Unirse</button>
-        `;
+        </div>
+      `;
         cont.appendChild(div);
       });
     } catch (err) {
@@ -115,6 +120,27 @@
     }
   }
 
+  async function eliminarSorteo(idSorteo) {
+    const confirmar = confirm("¿Estás seguro que querés eliminar este sorteo?");
+    if (!confirmar) return;
+
+    const id_usuario = getUsuarioID();
+    try {
+      const res = await fetch('/api/sorteos/eliminar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_sorteo: idSorteo, id_usuario })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      alert('Sorteo eliminado');
+      listarSorteos();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error al eliminar sorteo');
+    }
+  }
+
   function getUsuarioID() {
     const id = localStorage.getItem('usuarioID');
     if (!id) {
@@ -124,8 +150,8 @@
     return parseInt(id, 10);
   }
 
-  // Hacer públicas para HTML
+  // Exponer para el HTML
   window.unirseSorteo = unirseSorteo;
   window.actualizarCantidad = actualizarCantidad;
-
+  window.eliminarSorteo = eliminarSorteo;
 })();

@@ -95,8 +95,11 @@
 
     function comenzarPartida(ganoRojo) {
       const moneda = document.getElementById('moneda');
-      moneda.style.animation = 'none';
-      moneda.style.transform = ganoRojo ? 'rotateY(0deg)' : 'rotateY(180deg)';
+      moneda.style.animation = 'tirarMoneda 1s ease-in-out';
+      setTimeout(() => {
+        moneda.style.animation = 'none';
+        moneda.style.transform = ganoRojo ? 'rotateY(0deg)' : 'rotateY(180deg)';
+      }, 1000);
     }
 
     async function cargarSala() {
@@ -104,11 +107,8 @@
         const res = await fetch(`/coinflip/sala/${idSala}`);
         if (!res.ok) throw new Error('Sala no encontrada');
         const datosSala = await res.json();
-
-        // Guardar en variable local
         const sala = datosSala;
 
-        // Jugadores
         document.getElementById('jugador-rojo').textContent = sala.creador || '---';
         document.getElementById('jugador-negro').textContent = sala.oponente || 'Esperando...';
 

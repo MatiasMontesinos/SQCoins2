@@ -167,5 +167,35 @@ router.post('/unirse', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al unirse al sorteo' });
   }
 });
+// POST /api/sorteos/eliminar
+router.post('/eliminar', async (req, res) => {
+  const { id_sorteo, id_usuario } = req.body;
+  try {
+    const connection = await initDb();
+
+    const [[sorteo]] = await connection.execute(
+      'SELECT * FROM sorteos WHERE id_sorteo = ? AND id_creador = ? AND completado = false',
+      [id_sorteo, id_usuario]
+    );
+
+    if (!sorteo) {
+      return res.status(403).json({ success: false, message: 'No autorizado o sorteo ya completado' });
+    }
+
+    // Devolver monedas al creador
+    await connection.execute(
+      'UPDATE usuarios SET monedasTotales = monedasTotales + ? WHERE id = ?',
+      [sorteo.cantidad_sorteo, id_usuario]
+    );
+
+    await connection.execute('DELETE FROM sorteos_participantes WHERE id_sorteo = ?', [id_sorteo]);
+    await connection.execute('DELETE FROM sorteos WHERE id_sorteo = ?', [id_sorteo]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al eliminar sorteo:', err);
+    res.status(500).json({ success: false, message: 'Error al eliminar sorteo' });
+  }
+});
 
 module.exports = router;

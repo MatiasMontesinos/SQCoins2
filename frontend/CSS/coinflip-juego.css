@@ -96,6 +96,7 @@
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
   cursor: default;
+  transition: transform 0.5s ease-in-out;
 }
 
 /* Caras */
@@ -179,4 +180,16 @@ main#contenido {
 /* 3) Asegura html y body al 100% (por si no están ya) */
 html, body {
   height: 100%;
+}
+
+@keyframes tirarMoneda {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  50% {
+    transform: scale(1.5) rotateY(180deg);
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+  }
 }

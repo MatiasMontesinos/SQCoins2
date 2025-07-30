@@ -19,3 +19,7 @@ main#contenido {
   background-position: center; 
   background-repeat: no-repeat; 
 }
+html, body {
+  margin: 0;
+  padding: 0;
+}
