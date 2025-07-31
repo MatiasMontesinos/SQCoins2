@@ -12,7 +12,7 @@ async function cargarRankings() {
         return '<li>No hay jugadores que cumplan el mínimo.</li>';
       }
       return rankingArray.map(jugador =>
-        `<li><span class="name">${jugador.nombre}</span><span class="points">${jugador.monedas}</span></li>`
+        `<li><span class="name">${jugador.username}</span><span class="points">${jugador.monedas}</span></li>`
       ).join('');
     };
 

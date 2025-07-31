@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS sorteos (
   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   id_ganador INT,
   completado BOOLEAN NOT NULL DEFAULT false,
-  FOREIGN KEY (id_creador) REFERENCES usuarios(id),
-  FOREIGN KEY (id_ganador)   REFERENCES usuarios(id)
+  FOREIGN KEY (id_creador) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_ganador)   REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS sorteos_participantes (
@@ -54,9 +54,9 @@ CREATE TABLE IF NOT EXISTS juego1 (
   id_ganador  INT,
   cant_apostada INT NOT NULL,
   resuelto      BOOLEAN NOT NULL DEFAULT FALSE,
-  FOREIGN KEY (id_jugador1) REFERENCES usuarios(id),
-  FOREIGN KEY (id_jugador2) REFERENCES usuarios(id),
-  FOREIGN KEY (id_ganador)   REFERENCES usuarios(id)
+  FOREIGN KEY (id_jugador1) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_jugador2) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_ganador)   REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS juego2 (
@@ -66,5 +66,5 @@ CREATE TABLE IF NOT EXISTS juego2 (
   cant_minas     INT NOT NULL,
   cant_retirada  INT NOT NULL,
   cant_seleccionados INT NOT NULL,
-  FOREIGN KEY (id_creador) REFERENCES usuarios(id)
+  FOREIGN KEY (id_creador) REFERENCES usuarios(id) ON DELETE CASCADE
 );

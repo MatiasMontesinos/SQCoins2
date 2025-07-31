@@ -59,7 +59,7 @@ async function crearSala(idJugador1, cantApostada) {
 // Listar salas activas
 async function listarSalasActivas() {
   const [rows] = await pool.query(`
-    SELECT j.id_sala_juego1, j.cant_apostada, j.id_jugador1, j.id_jugador2, u.nombre as creador
+    SELECT j.id_sala_juego1, j.cant_apostada, j.id_jugador1, j.id_jugador2, u.username as creador
     FROM juego1 j
     JOIN usuarios u ON j.id_jugador1 = u.id
     WHERE j.id_jugador2 IS NULL AND (j.resuelto IS NULL OR j.resuelto = FALSE)

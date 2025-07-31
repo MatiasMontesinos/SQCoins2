@@ -8,7 +8,7 @@ router.get('/rankings', async (req, res) => {
     const connection = await initDb();
 
     const [juego1] = await connection.query(
-      `SELECT nombre, cant_ganada_juego1 AS monedas
+      `SELECT username, cant_ganada_juego1 AS monedas
        FROM usuarios
        WHERE cant_ganada_juego1 >= 110
        ORDER BY cant_ganada_juego1 DESC
@@ -16,7 +16,7 @@ router.get('/rankings', async (req, res) => {
     );
 
     const [juego2] = await connection.query(
-      `SELECT nombre, cant_ganada_juego2 AS monedas
+      `SELECT username, cant_ganada_juego2 AS monedas
        FROM usuarios
        WHERE cant_ganada_juego2 >= 110
        ORDER BY cant_ganada_juego2 DESC
@@ -24,7 +24,7 @@ router.get('/rankings', async (req, res) => {
     );
 
     const [sorteo] = await connection.query(
-      `SELECT nombre, cant_ganada_sorteo AS monedas
+      `SELECT username, cant_ganada_sorteo AS monedas
        FROM usuarios
        WHERE cant_ganada_sorteo >= 110
        ORDER BY cant_ganada_sorteo DESC
