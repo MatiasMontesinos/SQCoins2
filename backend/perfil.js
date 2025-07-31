@@ -179,7 +179,16 @@ router.post('/eliminar-cuenta', async (req, res) => {
 
   try {
     // Eliminar usuario de la base de datos
+    await connection.execute('DELETE FROM sorteos_participantes WHERE id_usuario = ?', [id]);
+
+    await connection.execute('DELETE FROM sorteos WHERE id_creador = ? OR id_ganador = ?', [id, id]);
+
+    await connection.execute('DELETE FROM juego1 WHERE id_jugador1 = ? OR id_jugador2 = ? OR id_ganador = ?', [id, id, id]);
+
+    await connection.execute('DELETE FROM juego2 WHERE id_creador = ?', [id]);
+
     await connection.execute('DELETE FROM usuarios WHERE id = ?', [id]);
+
 
     // Destruir la sesión después de eliminar
     req.session.destroy(err => {
